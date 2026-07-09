@@ -12,13 +12,13 @@ public class ProductResponse {
 
     private String productName;
 
-    private long price;
+    // private long price;
 
     private String mall;
 
     private String productUrl;
 
-    private String imageUrl;
+    // private String imageUrl;
 
-    private boolean soldOut;
+    // private boolean soldOut;
 }

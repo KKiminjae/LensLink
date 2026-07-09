@@ -8,15 +8,15 @@ public enum Mall {
 
     MUSINSA(
             "무신사",
-            "http://"
+            "https://www.musinsa.com/search/goods?keyword="
     ),
     KREAM(
             "크림",
-            "http://"
+            "https://kream.co.kr/search?keyword="
     ),
     FRUITS_FAMILY(
             "후루츠패밀리",
-            "http://"
+            "https://fruitsfamily.com/search/"
     );
     private final String displayName;
     private final String searchUrl;
