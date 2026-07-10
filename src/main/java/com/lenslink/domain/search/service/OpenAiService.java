@@ -6,6 +6,7 @@ import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.OpenAIRequest;
 import com.lenslink.domain.search.dto.OpenAIResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,12 +16,15 @@ import java.util.Base64;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class OpenAiService {
 
     private final WebClient openAiWebClient;
-
     private final ObjectMapper objectMapper;
+
+    public OpenAiService(@Qualifier("openAiWebClient") WebClient openAiWebClient, ObjectMapper objectMapper) {
+        this.openAiWebClient = openAiWebClient;
+        this.objectMapper = objectMapper;
+    }
 
     private String convertToBase64(MultipartFile image){
         try {
