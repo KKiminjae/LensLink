@@ -2,23 +2,25 @@ package com.lenslink.domain.search.service;
 
 import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.ProductResponse;
+import com.lenslink.domain.search.service.platform.SearchPlatform;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SearchPlatformService {
 
-    private final MusinsaApiService musinsaApiService;
-
-    private String createKeyword(AnalyzeResponse analyzeResponse){
-
-        return analyzeResponse.getBrand();
-    }
+    private final List<SearchPlatform> platforms;
 
     public List<ProductResponse> search(AnalyzeResponse analyzeResponse){
-        String keyword = createKeyword(analyzeResponse);
-        return musinsaApiService.search(keyword);
+        List<ProductResponse> products = new ArrayList<>();
+
+        for (SearchPlatform platform : platforms) {
+            products.addAll(platform.search(analyzeResponse));
+        }
+        return products;
     }
 }

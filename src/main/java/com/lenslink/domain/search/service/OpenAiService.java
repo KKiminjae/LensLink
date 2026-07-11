@@ -68,7 +68,7 @@ public class OpenAiService {
                   ]
                 }
                 """);
-        String mimeType = image.getContentType();
+        String mimeType = image.getContentType();   // image/png 반환
 
         OpenAIRequest.Content imageContent =
                 new OpenAIRequest.InputImage(
@@ -85,14 +85,6 @@ public class OpenAiService {
             .model("gpt-4.1-mini")
             .input(List.of(input))
             .build();
-        try {
-        System.out.println(
-        objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(request)
-        );
-        } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-        }
 
         OpenAIResponse response = openAiWebClient.post()
                 .uri("/responses")
