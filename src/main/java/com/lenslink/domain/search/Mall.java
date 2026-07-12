@@ -7,22 +7,17 @@ import lombok.RequiredArgsConstructor;
 public enum Mall {
 
     MUSINSA(
-            "무신사",
-            "https://www.musinsa.com/search/goods?keyword="
+            "무신사"
     ),
     KREAM(
-            "크림",
-            "https://kream.co.kr/search?keyword="
+            "크림"
     ),
     FRUITS_FAMILY(
-            "후루츠패밀리",
-            "https://fruitsfamily.com/search/"
+            "후루츠패밀리"
     );
     private final String displayName;
-    private final String searchUrl;
 
-    Mall(String displayName, String searchUrl) {
+    Mall(String displayName) {
         this.displayName = displayName;
-        this.searchUrl = searchUrl;
     }
 }

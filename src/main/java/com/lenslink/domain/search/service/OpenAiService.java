@@ -6,6 +6,7 @@ import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.OpenAIRequest;
 import com.lenslink.domain.search.dto.OpenAIResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,12 +16,15 @@ import java.util.Base64;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class OpenAiService {
 
     private final WebClient openAiWebClient;
-
     private final ObjectMapper objectMapper;
+
+    public OpenAiService(@Qualifier("openAiWebClient") WebClient openAiWebClient, ObjectMapper objectMapper) {
+        this.openAiWebClient = openAiWebClient;
+        this.objectMapper = objectMapper;
+    }
 
     private String convertToBase64(MultipartFile image){
         try {
@@ -64,7 +68,7 @@ public class OpenAiService {
                   ]
                 }
                 """);
-        String mimeType = image.getContentType();
+        String mimeType = image.getContentType();   // image/png 반환
 
         OpenAIRequest.Content imageContent =
                 new OpenAIRequest.InputImage(
@@ -81,14 +85,6 @@ public class OpenAiService {
             .model("gpt-4.1-mini")
             .input(List.of(input))
             .build();
-        try {
-        System.out.println(
-        objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(request)
-        );
-        } catch (JsonProcessingException e) {
-        throw new RuntimeException(e);
-        }
 
         OpenAIResponse response = openAiWebClient.post()
                 .uri("/responses")
