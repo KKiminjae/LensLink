@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class MusinsaApiService implements SearchPlatform{
+public class MusinsaService implements SearchPlatform{
 
     @Override
     public List<ProductResponse> search(AnalyzeResponse analyzeResponse) {
