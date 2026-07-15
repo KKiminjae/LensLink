@@ -1,4 +1,4 @@
-package com.lenslink.domain.search.dto;
+package com.lenslink.domain.search.dto.OpenAi;
 
 import lombok.Getter;
 

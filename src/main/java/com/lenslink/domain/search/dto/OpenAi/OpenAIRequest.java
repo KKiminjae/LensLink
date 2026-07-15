@@ -1,9 +1,7 @@
-package com.lenslink.domain.search.dto;
+package com.lenslink.domain.search.dto.OpenAi;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
