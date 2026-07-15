@@ -34,4 +34,8 @@ public class AnalyzeResponse {
         private String productName;
         private int confidence;
     }
+
+    public String getSearchKeyword(){
+        return brand + " " + productName;
+    }
 }
