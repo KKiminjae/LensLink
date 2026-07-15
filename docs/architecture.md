@@ -8,24 +8,25 @@ LensLink는 이미지를 업로드하면 AI가 상품 정보를 분석하고,
 ---
 
 ## 전체 흐름
-
-Image Upload
-
-↓
-
-OpenAI Vision
-
-↓
-
+```
+SearchController
+       │
+       ▼
+SearchService
+       │
+       ▼
+OpenAIService
+       │ 
+       ▼
 AnalyzeResponse
-
-↓
-
+       │
+       ▼
 SearchPlatformService
-
-↓
-
-ProductResponse
+       │
+┌──────┬───────┐
+▼      ▼       ▼
+NAVER  KREAM  Musinsa
+```
 
 ---
 
