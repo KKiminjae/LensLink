@@ -1,8 +1,7 @@
-# 2. api-research.md
+# api-research.md
 
 이 문서는 **조사 결과만** 적는다.
 
-```md
 # Platform API Research
 
 ## 조사 목적
@@ -68,6 +67,29 @@ Nuxt 직렬화 구조 사용.
 
 # Naver Shopping
 
-공식 Search API 존재.
+## 공식 API
 
-공식 API 사용 예정.
+제공
+
+REST API 형태로 쇼핑 검색 기능 지원.
+
+## 조사 결과
+
+- 공식 Search API 사용 가능
+- Client ID / Client Secret 기반 인증
+- JSON 응답 제공
+- 상품명, 가격, 이미지, 쇼핑몰 정보 제공
+- 호출 제한 및 사용량 정책 존재
+
+## 선택 이유
+
+- 공식 API 제공
+- 안정적인 호출 가능
+- 유지보수가 용이
+- 프로젝트 요구사항에 적합
+
+## 결론
+
+공식 Search API를 채택하여 상품 검색 기능을 구현하기로 결정.
+
+---

@@ -38,6 +38,8 @@ public class OpenAiService {
 
         String base64Image = convertToBase64(image);
 
+        // request는 우리가 openAi로 보내는 데이터 (요청)
+        // 우리는 json을 모르기에 객체로 일단 만듦
         OpenAIRequest.Content textContent =
                 new OpenAIRequest.InputText("""
                 당신은 패션 상품을 분석하는 AI입니다.
@@ -87,9 +89,9 @@ public class OpenAiService {
 
         OpenAIResponse response = openAiWebClient.post()
                 .uri("/responses")
-                .bodyValue(request)
+                .bodyValue(request) //여기서 json으로 변경
                 .retrieve()
-                .bodyToMono(OpenAIResponse.class)
+                .bodyToMono(OpenAIResponse.class) // json을 OpenAIResponse로 변경
                 .block();
 
         String result = response.getOutput()
