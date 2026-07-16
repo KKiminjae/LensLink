@@ -51,3 +51,30 @@ WebClient를 이용한 연동이 쉽고,
 
 따라서 상품 검색 기능은
 NAVER Shopping API를 우선 적용하기로 결정하였다.
+
+## SearchPlatform 예외 처리 정책
+
+### 결정
+
+외부 API 호출 실패는
+서비스 전체 실패로 처리하지 않는다.
+
+### 이유
+
+SearchPlatform은
+플랫폼별 독립성을 위해 만든 구조이다.
+
+따라서
+
+- Naver 실패
+- Kream 검색
+- Musinsa 검색
+
+은 서로 영향을 주지 않아야 한다.
+
+외부 API 예외는
+로그를 남기고 빈 리스트를 반환한다.
+
+NullPointerException은
+프로그래밍 버그이므로
+catch하지 않고 수정한다.

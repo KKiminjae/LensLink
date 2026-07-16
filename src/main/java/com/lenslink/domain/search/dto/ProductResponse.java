@@ -13,7 +13,7 @@ public class ProductResponse {
 
     private String productName;
 
-    private long price;
+    private int price;
 
     private String mall;
 
