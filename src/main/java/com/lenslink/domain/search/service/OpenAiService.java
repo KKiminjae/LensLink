@@ -42,32 +42,61 @@ public class OpenAiService {
         // 우리는 json을 모르기에 객체로 일단 만듦
         OpenAIRequest.Content textContent =
                 new OpenAIRequest.InputText("""
-                당신은 패션 상품을 분석하는 AI입니다.
-
-                업로드된 이미지를 분석하여 아래 정보를 추출하세요.
-
-                규칙
-                - 반드시 JSON만 출력하세요.
-                - 설명이나 Markdown(```)을 포함하지 마세요.
-                - 브랜드를 알 수 없으면 "Unknown"을 입력하세요.
-                - 상품명을 알 수 없으면 가장 적절한 일반적인 이름을 작성하세요.
-                - confidence는 0~100 사이의 정수입니다.
-
-                다음 JSON 형식으로만 응답하세요.
-
-                {
-                  "brand": "",
-                  "productName": "",
-                  "color": "",
-                  "category": "",
-                  "confidence": 0,
-                  "similarProducts": [
-                    {
-                      "productName": "",
-                      "confidence": 0
-                    }
-                  ]
-                }
+                        당신은 패션 상품을 식별하는 AI가 아닙니다.
+                        
+                        당신의 목표는 온라인 쇼핑몰에서 동일 상품을 가장 정확하게 검색할 수 있도록
+                        공식 브랜드명, 공식 제품명, 모델명을 최대한 추론하는 것입니다.
+                        
+                        상품의 모델명을 찾는 것이 가장 중요한 목표입니다.
+                        
+                        브랜드는 반드시 이미지에서 확인 가능한 정보만 사용하세요.
+                        
+                        브랜드를 추측하거나 만들어내지 마세요.
+                        
+                        브랜드명이 명확하게 읽히지 않으면
+                        Unknown을 반환하세요.
+                        
+                        제품의 특징(로고, 프린트, 토캡, 끈, 밑창, 실루엣, 포켓, 스티치 등)을
+                        활용하여 가장 가능성이 높은 모델명을 추론하세요.
+                        
+                         규칙
+                        
+                         - 반드시 JSON만 출력하세요.
+                         - Markdown이나 설명은 출력하지 마세요.
+                         - 브랜드는 최대한 정확하게 추론하세요.
+                         - 브랜드를 알 수 없으면 "Unknown"을 입력하세요.
+                         - 제품명은 가능한 공식 상품명을 추론하세요.
+                         - 모델명이나 컬렉션명이 보이면 반드시 포함하세요.
+                         - 색상은 검색 정확도 향상에 도움이 될 경우만 포함하세요.
+                         - confidence는 0~100 사이의 정수입니다.
+                         - searchKeyword는 쇼핑몰 검색창에 그대로 입력할 수 있는 가장 정확한 검색어 하나만 생성하세요.
+                         - searchKeyword에는 브랜드와 제품명을 반드시 포함하세요.
+                         - 일반적인 표현(남성 의류, 캐주얼 티셔츠 등)은 사용하지 마세요.
+                         - 제품명은 일반적인 이름이 아니라
+                         - 공식 모델명을 최대한 추론하세요.
+                         - 모델명이 확실하지 않다면
+                           브랜드에서 실제 판매되는 모델명을 추론하세요.
+                         - 로고, 밑창, 끈, 토캡, 실루엣 등
+                           제품의 특징을 적극적으로 활용하세요.
+                         - similarProducts에는
+                           가능성이 높은 모델명을 confidence 순으로 최대 5개까지 제시하세요.
+                        
+                         다음 JSON 형식으로만 응답하세요.
+                        
+                         {
+                           "brand": "",
+                           "productName": "",
+                           "color": "",
+                           "category": "",
+                           "confidence": 0,
+                           "searchKeyword": "",
+                           "similarProducts": [
+                             {
+                               "productName": "",
+                               "confidence": 0
+                             }
+                           ]
+                         }
                 """);
         String mimeType = image.getContentType();   // image/png 반환
 
@@ -83,7 +112,7 @@ public class OpenAiService {
             .build();
         OpenAIRequest request =
         OpenAIRequest.builder()
-            .model("gpt-4.1-mini")
+            .model("gpt-4.1")
             .input(List.of(input))
             .build();
 

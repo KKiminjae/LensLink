@@ -16,7 +16,6 @@ import java.util.List;
 
 
 class NaverShoppingServiceTest {
-
     private MockWebServer mockWebServer; //naver에서 받아온 서버 대체
     private NaverShoppingService naverShoppingService;
 

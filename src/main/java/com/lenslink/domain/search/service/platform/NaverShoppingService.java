@@ -34,7 +34,7 @@ public class NaverShoppingService implements SearchPlatform{
                             .queryParam("display", 5)
                             .build())
                     .retrieve()
-                    .bodyToMono(NaverShoppingResponse.class)
+                    .bodyToMono(NaverShoppingResponse.class) //잠깐수정
                     .block();
             if (response == null || response.getItems() == null) {
                 return List.of();
@@ -56,6 +56,9 @@ public class NaverShoppingService implements SearchPlatform{
     }
 
     private ProductResponse toProductResponse(NaverShoppingResponse.Item item){
+        int productType = Integer.parseInt(item.getProductType());
+        boolean used = productType>=4 && productType <6;
+
         return ProductResponse.builder()
                 .brand(item.getBrand())
                 .price(Integer.parseInt(item.getLprice()))
@@ -63,6 +66,7 @@ public class NaverShoppingService implements SearchPlatform{
                 .productUrl(item.getLink())
                 .imageUrl(item.getImage())
                 .productName(removeHtml(item.getTitle()))
+                .used(used)
                 .build();
     }
 

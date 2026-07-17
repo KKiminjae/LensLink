@@ -18,6 +18,11 @@ public class SearchService {
 
     public List<ProductResponse> search(MultipartFile image){
         AnalyzeResponse analyzeResponse = openAiService.analyzeImage(image);
+        System.out.println("brand= " + analyzeResponse.getBrand());
+        System.out.println("productName = " + analyzeResponse.getProductName());
+        System.out.println("searchKeyword = " + analyzeResponse.getSearchKeyword());
+        System.out.println("color = " + analyzeResponse.getColor());
+        System.out.println("category = " + analyzeResponse.getCategory());
         return searchPlatformService.search(analyzeResponse);
     }
 }
