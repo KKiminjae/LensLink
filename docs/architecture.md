@@ -10,22 +10,26 @@ LensLink는 이미지를 업로드하면 AI가 상품 정보를 분석하고,
 ## 전체 흐름
 ```
 SearchController
-       │
-       ▼
+        │
+        ▼
 SearchService
-       │
-       ▼
-OpenAIService
-       │ 
-       ▼
+        │
+        ├── OpenAI 이미지 분석
+        │
+        ▼
 AnalyzeResponse
-       │
-       ▼
+        │
+        ▼
 SearchPlatformService
-       │
-┌──────┬───────┐
-▼      ▼       ▼
-NAVER  KREAM  Musinsa
+        │
+        ▼
+List<ProductResponse>
+        │
+        ▼
+SearchResponse
+        ├── analysis
+        ├── newProducts
+        └── usedProducts
 ```
 
 ---
@@ -37,6 +41,8 @@ NAVER  KREAM  Musinsa
 - SearchPlatform 인터페이스 기반 확장
 - OpenAI와 검색 로직 분리
 - 공통 ProductResponse 반환
+- SearchService에서 상품 검색 결과를 새상품과
+  중고 상품으로 분리, SearchService로 감싸서 프론트에 반환
 
 ---
 

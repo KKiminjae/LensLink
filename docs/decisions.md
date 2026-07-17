@@ -52,6 +52,8 @@ WebClient를 이용한 연동이 쉽고,
 따라서 상품 검색 기능은
 NAVER Shopping API를 우선 적용하기로 결정하였다.
 
+---
+
 ## SearchPlatform 예외 처리 정책
 
 ### 결정
@@ -78,3 +80,45 @@ SearchPlatform은
 NullPointerException은
 프로그래밍 버그이므로
 catch하지 않고 수정한다.
+
+---
+
+## SearchResponse 도입
+
+### 문제
+
+기존 API는 List<ProductResponse>만 반환하였다.
+
+이 경우
+
+- AI 분석 결과
+- 상품 검색 결과
+
+를 동시에 전달할 수 없었다.
+
+또한 프론트엔드가 새상품과 중고상품을 직접 분류해야 했다.
+
+---
+
+### 결정
+
+SearchResponse를 도입하여
+
+- analysis
+- newProducts
+- usedProducts
+
+를 함께 반환하도록 변경하였다.
+
+새상품과 중고상품 분리는 SearchService에서 수행한다.
+
+---
+
+### 이유
+
+- AI 분석 결과와 검색 결과를 하나의 응답으로 제공할 수 있다.
+- 프론트엔드가 별도의 분류 로직 없이 바로 화면을 구성할 수 있다.
+- UI 구조(🛍 새상품 / ♻️ 중고)와 API 구조를 일치시킬 수 있다.
+- 앞으로 새로운 플랫폼을 추가해도 응답 구조를 유지할 수 있다.
+
+---
