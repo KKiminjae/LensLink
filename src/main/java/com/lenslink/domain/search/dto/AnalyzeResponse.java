@@ -1,9 +1,6 @@
 package com.lenslink.domain.search.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -22,6 +19,8 @@ public class AnalyzeResponse {
     private String category;
 
     private int confidence;
+
+    private String searchKeyword;
 
 
     private List<SimilarProductResponse> similarProducts;

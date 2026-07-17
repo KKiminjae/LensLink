@@ -21,5 +21,5 @@ public class ProductResponse {
 
     private String imageUrl;
 
-    // private boolean soldOut;
+    private boolean used;
 }

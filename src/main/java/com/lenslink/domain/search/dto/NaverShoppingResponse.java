@@ -24,5 +24,7 @@ public class NaverShoppingResponse {
         private String mallName;
 
         private String brand;
+
+        private String productType;
     }
 }
