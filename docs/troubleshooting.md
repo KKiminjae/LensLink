@@ -128,3 +128,25 @@ SearchResponse에 담아 반환하도록 수정.
 
 Controller 역시 반환 타입을 SearchResponse로 변경하여
 API 응답 구조를 일치시킴.
+
+## 6.
+
+### 문제
+
+Flutter에서 검색 결과를 파싱하는 과정에서 
+
+```text
+type 'int' is not a subtype of type 'String'
+```
+
+다음 오류가 발생하였다.
+
+### 원인
+
+Spring Boot의 ProductResponse는 price를 int로 반환하지만,
+Flutter 모델은 String으로 선언되어 있었다.
+
+### 해결
+
+Flutter Product 모델의 price 타입을 int로 수정하고,
+UI에서 문자열로 변환하여 출력하도록 변경하였다.

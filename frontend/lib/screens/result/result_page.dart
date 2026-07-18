@@ -19,21 +19,14 @@ class ResultPage extends StatefulWidget {
 
 class _ResultPageState extends State<ResultPage> {
   _ProductFilter _filter = _ProductFilter.all;
-  int _selectedPlatformIndex = 0;
-
-  final List<_PlatformTab> _platformTabs = const [
-    _PlatformTab(name: "후루츠", count: 8, icon: Icons.local_mall),
-    _PlatformTab(name: "번개장터", count: 6, icon: Icons.bolt),
-    _PlatformTab(name: "무신사", count: 4, icon: Icons.shopping_bag),
-    _PlatformTab(name: "EQL", count: 3, icon: Icons.storefront),
-  ];
+  String? _selectedPlatform;
 
   List<Product> get _allProducts => [
     ...widget.result.usedProducts,
     ...widget.result.newProducts,
   ];
 
-  List<Product> get _products {
+  List<Product> get _baseProducts {
     switch (_filter) {
       case _ProductFilter.used:
         return widget.result.usedProducts;
@@ -42,6 +35,49 @@ class _ResultPageState extends State<ResultPage> {
       case _ProductFilter.all:
         return _allProducts;
     }
+  }
+
+  List<Product> get _products {
+    if (_selectedPlatform == null) return _baseProducts;
+
+    return _baseProducts
+        .where((product) => _platformName(product) == _selectedPlatform)
+        .toList();
+  }
+
+  List<_PlatformTab> get _platformTabs {
+    final counts = <String, int>{};
+
+    for (final product in _baseProducts) {
+      final platform = _platformName(product);
+
+      if (platform.isEmpty) continue;
+
+      counts[platform] = (counts[platform] ?? 0) + 1;
+    }
+
+    return counts.entries
+        .map((entry) => _PlatformTab(name: entry.key, count: entry.value))
+        .toList();
+  }
+
+  String _platformName(Product product) {
+    if (product.platform.trim().isNotEmpty) return product.platform.trim();
+    return product.mall.trim();
+  }
+
+  void _changeFilter(_ProductFilter filter) {
+    setState(() {
+      _filter = filter;
+
+      final platformExists = _platformTabs.any(
+        (platform) => platform.name == _selectedPlatform,
+      );
+
+      if (!platformExists) {
+        _selectedPlatform = null;
+      }
+    });
   }
 
   Product? get _summaryProduct {
@@ -81,36 +117,49 @@ class _ResultPageState extends State<ResultPage> {
                 totalCount: _allProducts.length,
                 usedCount: widget.result.usedProducts.length,
                 newCount: widget.result.newProducts.length,
-                onChanged: (filter) {
-                  setState(() {
-                    _filter = filter;
-                  });
-                },
+                onChanged: _changeFilter,
               ),
             ),
             const SizedBox(height: 14),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  final platform = _platformTabs[index];
+            if (_platformTabs.isNotEmpty)
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return _PlatformButton(
+                        label: "전체",
+                        selected: _selectedPlatform == null,
+                        onTap: () {
+                          setState(() {
+                            _selectedPlatform = null;
+                          });
+                        },
+                      );
+                    }
 
-                  return _PlatformButton(
-                    platform: platform,
-                    selected: _selectedPlatformIndex == index,
-                    onTap: () {
-                      setState(() {
-                        _selectedPlatformIndex = index;
-                      });
-                    },
-                  );
-                },
-                separatorBuilder: (context, index) => const SizedBox(width: 10),
-                itemCount: _platformTabs.length,
+                    final platform = _platformTabs[index - 1];
+
+                    return _PlatformButton(
+                      label: platform.name,
+                      count: platform.count,
+                      selected: _selectedPlatform == platform.name,
+                      onTap: () {
+                        setState(() {
+                          _selectedPlatform = _selectedPlatform == platform.name
+                              ? null
+                              : platform.name;
+                        });
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 10),
+                  itemCount: _platformTabs.length + 1,
+                ),
               ),
-            ),
             const SizedBox(height: 4),
             Expanded(
               child: _products.isEmpty
@@ -298,12 +347,14 @@ class _FilterButton extends StatelessWidget {
 }
 
 class _PlatformButton extends StatelessWidget {
-  final _PlatformTab platform;
+  final String label;
+  final int? count;
   final bool selected;
   final VoidCallback onTap;
 
   const _PlatformButton({
-    required this.platform,
+    required this.label,
+    this.count,
     required this.selected,
     required this.onTap,
   });
@@ -330,11 +381,15 @@ class _PlatformButton extends StatelessWidget {
             CircleAvatar(
               radius: 10,
               backgroundColor: selected ? AppColors.primary : AppColors.text,
-              child: Icon(platform.icon, color: Colors.white, size: 11),
+              child: const Icon(
+                Icons.storefront,
+                color: Colors.white,
+                size: 11,
+              ),
             ),
             const SizedBox(width: 6),
             Text(
-              "${platform.name} ${platform.count}",
+              count == null ? label : "$label $count",
               style: TextStyle(
                 color: selected ? AppColors.primary : AppColors.text,
                 fontSize: 11,
@@ -372,11 +427,6 @@ class _EmptyResult extends StatelessWidget {
 class _PlatformTab {
   final String name;
   final int count;
-  final IconData icon;
 
-  const _PlatformTab({
-    required this.name,
-    required this.count,
-    required this.icon,
-  });
+  const _PlatformTab({required this.name, required this.count});
 }

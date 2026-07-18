@@ -9,6 +9,29 @@ class ProductCard extends StatelessWidget {
 
   const ProductCard({super.key, required this.product});
 
+  String get _formattedPrice {
+    final rawPrice = product.price.toString();
+    final digits = rawPrice.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (digits.isEmpty) {
+      return rawPrice.isEmpty ? "가격 정보 없음" : rawPrice;
+    }
+
+    final buffer = StringBuffer();
+
+    for (int i = 0; i < digits.length; i++) {
+      final remaining = digits.length - i;
+
+      buffer.write(digits[i]);
+
+      if (remaining > 1 && remaining % 3 == 1) {
+        buffer.write(',');
+      }
+    }
+
+    return "$buffer원";
+  }
+
   Future<void> _openLink() async {
     if (product.productUrl.isEmpty) return;
 
@@ -50,7 +73,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    product.price,
+                    _formattedPrice,
                     style: const TextStyle(
                       color: AppColors.text,
                       fontSize: 17,
@@ -59,7 +82,7 @@ class ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    product.mall.isEmpty ? "플랫폼 정보 없음" : product.mall,
+                    product.mall.isEmpty ? "몰 정보 없음" : product.mall,
                     style: const TextStyle(
                       color: AppColors.subText,
                       fontSize: 11,
