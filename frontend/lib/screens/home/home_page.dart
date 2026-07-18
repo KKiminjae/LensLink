@@ -1,0 +1,282 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+
+import '../../core/constants/app_colors.dart';
+import '../../services/image_picker_service.dart';
+import '../../widgets/lens_bottom_navigation.dart';
+import '../analysis/analysis_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ImagePickerService _imagePickerService = ImagePickerService();
+
+  final List<_RecentSearch> recentSearches = const [
+    _RecentSearch(
+      title: "Nike Air Max DN Triple Black",
+      date: "2024.05.21",
+      icon: Icons.directions_run,
+    ),
+    _RecentSearch(
+      title: "Stussy 8 Ball Hoodie",
+      date: "2024.05.20",
+      icon: Icons.checkroom,
+    ),
+    _RecentSearch(
+      title: "Carhartt Detroit Jacket",
+      date: "2024.05.18",
+      icon: Icons.inventory_2_outlined,
+    ),
+  ];
+
+  Future<void> _pickImage() async {
+    final image = await _imagePickerService.pickImage();
+
+    if (image == null || !mounted) return;
+
+    _goToAnalysis(image);
+  }
+
+  void _goToAnalysis(File image) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AnalysisPage(image: image)),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _HomeHeader(),
+              const SizedBox(height: 10),
+              const Divider(height: 1, thickness: 1, color: AppColors.border),
+              const SizedBox(height: 34),
+              const Center(
+                child: Text(
+                  "사진 한 장으로\n원하는 상품을 찾아보세요",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.text,
+                    fontSize: 22,
+                    height: 1.45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 28),
+              _UploadBox(onTap: _pickImage),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  const Text(
+                    "최근 검색",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(46, 32),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      "더보기 >",
+                      style: TextStyle(color: Colors.black, fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              ...recentSearches.map(
+                (search) => _RecentSearchTile(search: search),
+              ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: const LensBottomNavigation(currentIndex: 0),
+    );
+  }
+}
+
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text(
+          "LensLink",
+          style: TextStyle(
+            color: AppColors.primary,
+            fontSize: 19,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const Spacer(),
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.menu),
+          visualDensity: VisualDensity.compact,
+        ),
+      ],
+    );
+  }
+}
+
+class _UploadBox extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _UploadBox({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(),
+        child: Container(
+          width: double.infinity,
+          height: 235,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAFAFA),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                "assets/images/upload_cloud.png",
+                width: 76,
+                height: 76,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(height: 14),
+              const Text(
+                "이미지를 업로드하거나\n여기에 드래그하세요",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.text,
+                  fontSize: 15,
+                  height: 1.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                "JPG, PNG, WEBP (최대 10MB)",
+                style: TextStyle(color: AppColors.subText, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecentSearchTile extends StatelessWidget {
+  final _RecentSearch search;
+
+  const _RecentSearchTile({required this.search});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Icon(search.icon, color: Colors.black, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  search.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  search.date,
+                  style: const TextStyle(color: Colors.black, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecentSearch {
+  final String title;
+  final String date;
+  final IconData icon;
+
+  const _RecentSearch({
+    required this.title,
+    required this.date,
+    required this.icon,
+  });
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.border
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    final radius = Radius.circular(8);
+    final rect = RRect.fromRectAndRadius(Offset.zero & size, radius);
+    final path = Path()..addRRect(rect);
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final next = distance + 8;
+        canvas.drawPath(metric.extractPath(distance, next), paint);
+        distance = next + 6;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
