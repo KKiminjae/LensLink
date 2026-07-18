@@ -9,27 +9,31 @@ LensLink는 이미지를 업로드하면 AI가 상품 정보를 분석하고,
 
 ## 전체 흐름
 ```
+Flutter
+      │
+      ▼
+POST /api/searches/analyze
+      │
+      ▼
 SearchController
-        │
-        ▼
+      │
+      ▼
 SearchService
-        │
-        ├── OpenAI 이미지 분석
-        │
-        ▼
-AnalyzeResponse
-        │
-        ▼
+      │
+      ▼
+OpenAIService
+      │
+      ▼
 SearchPlatformService
-        │
-        ▼
-List<ProductResponse>
-        │
-        ▼
-SearchResponse
-        ├── analysis
-        ├── newProducts
-        └── usedProducts
+      │
+      ▼
+NaverShoppingService
+      │
+      ▼
+ProductResponse
+      │
+      ▼
+Flutter ResultPage
 ```
 
 ---
