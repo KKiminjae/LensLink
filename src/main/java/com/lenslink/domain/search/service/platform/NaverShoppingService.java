@@ -3,6 +3,8 @@ package com.lenslink.domain.search.service.platform;
 import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.NaverShoppingResponse;
 import com.lenslink.domain.search.dto.ProductResponse;
+import com.lenslink.domain.search.service.candidate.SearchCandidateGenerator;
+import com.lenslink.domain.search.service.evaluator.SearchResultEvaluator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -10,23 +12,40 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Service
 public class NaverShoppingService implements SearchPlatform{
     private final WebClient webClient;
+    private final SearchResultEvaluator searchResultEvaluator;
+    private final SearchCandidateGenerator candidateGenerator;
 
-    public NaverShoppingService(@Qualifier("naverWebClient") WebClient webClient) {
+    public NaverShoppingService(
+            @Qualifier("naverWebClient") WebClient webClient,
+            SearchResultEvaluator searchResultEvaluator,
+            SearchCandidateGenerator candidateGenerator) {
         this.webClient = webClient;
+        this.searchResultEvaluator = searchResultEvaluator;
+        this.candidateGenerator = candidateGenerator;
     }
 
     @Override
-    public List<ProductResponse> search(AnalyzeResponse analyzeResponse){
-        try {
-            String query = analyzeResponse.getSearchKeyword();
+    public List<ProductResponse> search(AnalyzeResponse analyzeResponse) {
+        List<String> candidates = candidateGenerator.createCandidates(analyzeResponse);
 
+        for (String keyword : candidates) {
+            List<ProductResponse> products = searchByKeyword(keyword);
+
+            if(searchResultEvaluator.isGoodResult(analyzeResponse, products)){
+                return products;
+            }
+        }
+        return List.of();
+    }
+
+    private List<ProductResponse> searchByKeyword(String query){
+        try {
             NaverShoppingResponse response = webClient.get()
                     .uri(UriBuilder -> UriBuilder
                             .path("/v1/search/shop.json")
@@ -63,6 +82,7 @@ public class NaverShoppingService implements SearchPlatform{
                 .brand(item.getBrand())
                 .price(Integer.parseInt(item.getLprice()))
                 .mall(item.getMallName())
+                .platform("Naver Shopping")
                 .productUrl(item.getLink())
                 .imageUrl(item.getImage())
                 .productName(removeHtml(item.getTitle()))
