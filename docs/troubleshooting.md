@@ -183,3 +183,47 @@ AnalyzeResponse.SimilarProductResponse::getConfidence)
 ```
 
 ---
+
+## 8.
+
+### 문제
+
+상품명이
+
+```text
+Nike Air Force 1
+```
+
+인데
+
+예상 상품명이
+
+```text
+Air Force 1™
+```
+
+인 경우 검색 결과가 일치하지 않는 문제가 발생하였다.
+
+또한 브랜드에 포함된
+
+- ®
+- ™
+
+등의 특수문자 때문에 동일한 브랜드도 서로 다른 문자열로 인식하였다.
+
+### 원인
+
+단순 문자열 비교를 사용하고 있었기 때문이다.
+
+### 해결
+
+SearchNormalizer를 도입하여
+
+- trim()
+- toLowerCase()
+- 특수문자 제거
+- 공백 정규화
+
+를 공통 적용하였다.
+
+SearchCandidateGenerator와 SearchResultEvaluator 모두 동일한 정규화 규칙을 사용하도록 변경하였다.
