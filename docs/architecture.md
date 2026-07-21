@@ -56,15 +56,19 @@ Flutter ResultPage
 - 새로운 플랫폼 추가가 쉬운 구조
 - SearchPlatform 인터페이스 기반 확장
 - OpenAI와 검색 로직 분리
-- 공통 ProductResponse 반환
-- SearchService에서 상품 검색 결과를 새상품과
-  중고 상품으로 분리, SearchService로 감싸서 프론트에 반환
+- 검색 후보 생성과 결과 평가 책임 분리
+- 문자열 정규화 규칙을 공통으로 관리
+- 공통 SearchResponse 반환
+- SearchService에서 새상품과 중고 상품을 분리하여 프론트에 전달
 
 ---
 
-## 핵심 인터페이스
+## 핵심 컴포넌트
 
-SearchPlatform
-
-```java
-List<ProductResponse> search(AnalyzeResponse response);
+| 컴포넌트 | 역할 |
+|----------|------|
+| SearchPlatform | 플랫폼별 검색 인터페이스 |
+| SearchPlatformService | 등록된 플랫폼을 순회하며 검색 수행 |
+| SearchCandidateGenerator | OpenAI 분석 결과를 기반으로 검색 후보 생성 |
+| SearchNormalizer | 검색어와 검색 결과 문자열 정규화 |
+| SearchResultEvaluator | 검색 결과의 품질을 평가하여 재검색 여부 결정 |

@@ -1,8 +1,10 @@
 package com.lenslink.domain.search.service.candidate;
 
 import com.lenslink.domain.search.dto.AnalyzeResponse;
+import com.lenslink.domain.search.util.SearchNormalizer;
 import org.springframework.stereotype.Service;
 
+import java.nio.channels.SeekableByteChannel;
 import java.util.*;
 
 @Service
@@ -15,9 +17,12 @@ public class SearchCandidateGenerator {
         String brand = analyzeResponse.getBrand();
         String productName = analyzeResponse.getProductName();
 
-        if(isSearchableKeyword(brand) && isSearchableKeyword(productName)) candidates.add(brand + " " + productName);
+        String normalizedBrand = SearchNormalizer.normalize(brand);
+        String normalizedProductName = SearchNormalizer.normalize(productName);
 
-        if(isSearchableKeyword(productName)) candidates.add(productName);
+        if(!SearchNormalizer.isUnknown(normalizedBrand) && !SearchNormalizer.isUnknown(normalizedProductName)) candidates.add(normalizedBrand + " " + normalizedProductName);
+
+        if(!SearchNormalizer.isUnknown(normalizedProductName)) candidates.add(normalizedProductName);
 
 
         List<AnalyzeResponse.SimilarProductResponse> similarProducts = analyzeResponse.getSimilarProducts();
@@ -30,19 +35,16 @@ public class SearchCandidateGenerator {
                             .reversed());
 
             for (AnalyzeResponse.SimilarProductResponse similarProduct : similarProducts) {
+                String normalizedSimilarProduct = SearchNormalizer.normalize(similarProduct.getProductName());
 
-                if(similarProduct.getConfidence() >= MIN_CONFIDENCE && isSearchableKeyword(similarProduct.getProductName())){
-                    candidates.add(similarProduct.getProductName());
+                if(similarProduct.getConfidence() >= MIN_CONFIDENCE && !SearchNormalizer.isUnknown(normalizedSimilarProduct)){
+                    candidates.add(normalizedSimilarProduct);
                 }
             }
         }
 
-        if(isSearchableKeyword(brand)) candidates.add(brand);
+        if(!SearchNormalizer.isUnknown(normalizedBrand)) candidates.add(normalizedBrand);
 
         return new ArrayList<>(candidates);
-    }
-
-    private boolean isSearchableKeyword(String keyword){
-        return keyword != null && !keyword.isBlank() && !keyword.equalsIgnoreCase("Unknown");
     }
 }
