@@ -2,6 +2,8 @@ package com.lenslink.domain.search.service.platform;
 
 import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.ProductResponse;
+import com.lenslink.domain.search.service.candidate.SearchCandidateGenerator;
+import com.lenslink.domain.search.service.evaluator.SearchResultEvaluator;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -18,6 +20,8 @@ import java.util.List;
 class NaverShoppingServiceTest {
     private MockWebServer mockWebServer; //naver에서 받아온 서버 대체
     private NaverShoppingService naverShoppingService;
+    private SearchResultEvaluator searchResultEvaluator;
+    private SearchCandidateGenerator candidateGenerator;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -27,7 +31,7 @@ class NaverShoppingServiceTest {
         WebClient webClient = WebClient.builder()
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
-        naverShoppingService = new NaverShoppingService(webClient);
+        naverShoppingService = new NaverShoppingService(webClient,searchResultEvaluator,candidateGenerator);
     }
     @AfterEach
     void tearDown() throws IOException {

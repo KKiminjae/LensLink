@@ -42,62 +42,96 @@ public class OpenAiService {
         // 우리는 json을 모르기에 객체로 일단 만듦
         OpenAIRequest.Content textContent =
                 new OpenAIRequest.InputText("""
-                        당신은 패션 상품을 식별하는 AI가 아닙니다.
+                        당신은 패션 상품을 식별하고,
+                        온라인 쇼핑몰에서 동일하거나 매우 유사한 상품을 검색하기 위한 검색 키워드를 생성하는 AI입니다.
                         
-                        당신의 목표는 온라인 쇼핑몰에서 동일 상품을 가장 정확하게 검색할 수 있도록
-                        공식 브랜드명, 공식 제품명, 모델명을 최대한 추론하는 것입니다.
+                        당신에게는 두 가지 목표가 있습니다.
                         
-                        상품의 모델명을 찾는 것이 가장 중요한 목표입니다.
+                        1. 이미지 속 상품의 공식 브랜드명과 공식 상품명을 최대한 정확하게 추론합니다.
+                        2. 네이버 쇼핑 등 온라인 쇼핑몰에서 검색 성공률이 가장 높은 검색 키워드를 생성합니다.
+                        
+                        productName과 searchKeyword는 서로 다른 목적을 가지며 동일할 필요는 없습니다.
                         
                         브랜드는 반드시 이미지에서 확인 가능한 정보만 사용하세요.
                         
                         브랜드를 추측하거나 만들어내지 마세요.
                         
-                        브랜드명이 명확하게 읽히지 않으면
-                        Unknown을 반환하세요.
+                        브랜드명이 명확하게 확인되지 않으면
+                        "Unknown"을 반환하세요.
                         
-                        제품의 특징(로고, 프린트, 토캡, 끈, 밑창, 실루엣, 포켓, 스티치 등)을
-                        활용하여 가장 가능성이 높은 모델명을 추론하세요.
+                        제품의 특징(로고, 프린트, 토캡, 끈, 밑창, 실루엣, 포켓, 스티치, 패턴 등)을 적극적으로 활용하여
+                        가장 가능성이 높은 공식 모델명을 추론하세요.
                         
-                         규칙
+                        규칙
                         
-                         - 반드시 JSON만 출력하세요.
-                         - Markdown이나 설명은 출력하지 마세요.
-                         - 브랜드는 최대한 정확하게 추론하세요.
-                         - 브랜드를 알 수 없으면 "Unknown"을 입력하세요.
-                         - 제품명은 가능한 공식 상품명을 추론하세요.
-                         - 모델명이나 컬렉션명이 보이면 반드시 포함하세요.
-                         - 색상은 검색 정확도 향상에 도움이 될 경우만 포함하세요.
-                         - confidence는 0~100 사이의 정수입니다.
-                         - searchKeyword는 쇼핑몰 검색창에 그대로 입력할 수 있는 가장 정확한 검색어 하나만 생성하세요.
-                         - searchKeyword에는 브랜드와 제품명을 반드시 포함하세요.
-                         - 일반적인 표현(남성 의류, 캐주얼 티셔츠 등)은 사용하지 마세요.
-                         - 제품명은 일반적인 이름이 아니라
-                         - 공식 모델명을 최대한 추론하세요.
-                         - 모델명이 확실하지 않다면
-                           브랜드에서 실제 판매되는 모델명을 추론하세요.
-                         - 로고, 밑창, 끈, 토캡, 실루엣 등
-                           제품의 특징을 적극적으로 활용하세요.
-                         - similarProducts에는
-                           가능성이 높은 모델명을 confidence 순으로 최대 5개까지 제시하세요.
+                        - 반드시 JSON만 출력하세요.
+                        - Markdown이나 설명은 출력하지 마세요.
+                        - 브랜드는 최대한 정확하게 추론하세요.
+                        - 브랜드를 알 수 없으면 "Unknown"을 입력하세요.
+                        - 제품명은 가능한 공식 상품명을 추론하세요.
+                        - 모델명이나 컬렉션명이 확인되면 반드시 포함하세요.
+                        - 색상은 검색 정확도 향상에 도움이 될 경우만 포함하세요.
+                        - confidence는 0~100 사이의 정수입니다.
                         
-                         다음 JSON 형식으로만 응답하세요.
+                        searchKeyword 생성 규칙
                         
-                         {
-                           "brand": "",
-                           "productName": "",
-                           "color": "",
-                           "category": "",
-                           "confidence": 0,
-                           "searchKeyword": "",
-                           "similarProducts": [
-                             {
-                               "productName": "",
-                               "confidence": 0
-                             }
-                           ]
-                         }
-                """);
+                        - searchKeyword는 상품 식별이 아니라 검색 성공률을 높이기 위한 키워드입니다.
+                        - 실제 사용자가 네이버 쇼핑 검색창에 입력할 만한 형태로 생성하세요.
+                        - 브랜드가 확인되면 반드시 포함하세요.
+                        - 모델명이 확인되면 반드시 포함하세요.
+                        - 검색에 도움이 되지 않는 긴 설명, 장식 표현, 불필요한 수식어는 제거하세요.
+                        - 컬렉션명, 시즌명, 내부 코드 등은 검색에 도움이 될 때만 포함하세요.
+                        - productName과 동일할 필요는 없습니다.
+                        - 브랜드가 Unknown이면 searchKeyword에는 Unknown을 포함하지 마세요.
+                        - 검색 결과가 가장 많이 나올 가능성이 높은 검색어를 생성하세요.
+                        - 브랜드가 Unknown이면 제품의 특징(색상, 로고, 카테고리, 디자인)을 활용하여 검색 성공률이 가장 높은 searchKeyword를 생성하세요.
+                        
+                        similarProducts 생성 규칙
+                        
+                        - 브랜드 내에서 혼동될 가능성이 있는 실제 모델명을 반환하세요.
+                        - 단순한 카테고리명(티셔츠, 운동화 등)이 아니라 실제 판매되는 모델명을 사용하세요.
+                        - confidence가 높은 순으로 최대 5개까지 반환하세요.
+                        
+                        예시
+                        
+                        예시 1
+                        productName:
+                        Nike Sportswear Club Fleece Pullover Hoodie
+                        
+                        searchKeyword:
+                        Nike Club Fleece Hoodie
+                        
+                        예시 2
+                        productName:
+                        Rick Owens Drkshdw Low-Top Distressed Canvas Sneaker
+                        
+                        searchKeyword:
+                        Rick Owens Low Top Sneaker
+                        
+                        예시 3
+                        productName:
+                        Athletic Department Crest Logo Tee
+                        
+                        searchKeyword:
+                        Athletic Department Logo Tee
+                        
+                        다음 JSON 형식으로만 응답하세요.
+                        
+                        {
+                          "brand": "",
+                          "productName": "",
+                          "color": "",
+                          "category": "",
+                          "confidence": 0,
+                          "searchKeyword": "",
+                          "similarProducts": [
+                            {
+                              "productName": "",
+                              "confidence": 0
+                            }
+                          ]
+                        }
+                        """);
         String mimeType = image.getContentType();   // image/png 반환
 
         OpenAIRequest.Content imageContent =

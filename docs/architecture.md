@@ -29,8 +29,20 @@ SearchPlatformService
       ▼
 NaverShoppingService
       │
+      ├── SearchCandidateGenerator
+      │       │
+      │       ▼
+      │   검색 후보 생성
+      │
+      ├── Naver Shopping API 호출
+      │
+      ├── SearchResultEvaluator
+      │       │
+      │       ▼
+      │   검색 결과 평가
+      │
       ▼
-ProductResponse
+List<ProductResponse>
       │
       ▼
 Flutter ResultPage

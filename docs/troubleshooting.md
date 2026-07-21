@@ -150,3 +150,36 @@ Flutter 모델은 String으로 선언되어 있었다.
 
 Flutter Product 모델의 price 타입을 int로 수정하고,
 UI에서 문자열로 변환하여 출력하도록 변경하였다.
+
+---
+
+## 7.
+
+### 문제
+
+similarProducts.sort() 호출 시 다음 예외가 발생하였다.
+```text
+UnsupportedOperationException
+```
+
+### 원인
+
+테스트 코드에서 List.of()를 사용하여 similarProducts를 생성하였다.
+
+List.of()는 수정이 불가능한 Immutable List를 반환하므로 sort()를 호출할 수 없었다.
+
+### 해결
+
+정렬 전에 새로운 ArrayList를 생성하여 복사본을 만든 뒤 정렬하도록 수정하였다.
+
+```java
+List<AnalyzeResponse.SimilarProductResponse> similarProducts =
+new ArrayList<>(analyzeResponse.getSimilarProducts());
+
+similarProducts.sort(
+Comparator.comparingInt(
+AnalyzeResponse.SimilarProductResponse::getConfidence)
+.reversed());
+```
+
+---

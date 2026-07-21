@@ -15,6 +15,8 @@ public class ProductResponse {
 
     private int price;
 
+    private String platform;
+
     private String mall;
 
     private String productUrl;
