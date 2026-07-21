@@ -2,6 +2,7 @@ package com.lenslink.domain.search.service.evaluator;
 
 import com.lenslink.domain.search.dto.AnalyzeResponse;
 import com.lenslink.domain.search.dto.ProductResponse;
+import com.lenslink.domain.search.util.SearchNormalizer;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 @Service
 public class SearchResultEvaluator {
     public boolean isGoodResult(AnalyzeResponse analyzeResponse, List<ProductResponse> products){
-        if(products.isEmpty()) {
+        if(products == null || products.isEmpty()) {
             return false;
         }
 
@@ -27,10 +28,11 @@ public class SearchResultEvaluator {
     private boolean isBrandMatched(AnalyzeResponse analyzeResponse, List<ProductResponse> products){
         String expectBrand = analyzeResponse.getBrand();
 
-        if(expectBrand == null || expectBrand.isBlank() || expectBrand.equalsIgnoreCase("Unknown"))
-        {
+        if(SearchNormalizer.isUnknown(expectBrand)) {
             return true;
         }
+        String normalizedExpectedBrand = SearchNormalizer.normalize(expectBrand);
+
         for(ProductResponse product: products){
             String actualBrand = product.getBrand();
 
@@ -38,7 +40,9 @@ public class SearchResultEvaluator {
                 continue;
             }
 
-            if(expectBrand.equalsIgnoreCase(actualBrand)) {
+            String normalizedActualBrand = SearchNormalizer.normalize(actualBrand);
+
+            if(normalizedExpectedBrand.equals(normalizedActualBrand)) {
                 return true;
             }
         }
@@ -49,21 +53,21 @@ public class SearchResultEvaluator {
     private boolean isProductMatched(AnalyzeResponse analyzeResponse, List<ProductResponse> products){
         String expectProduct = analyzeResponse.getProductName();
 
-        if(expectProduct == null || expectProduct.isBlank() || expectProduct.equalsIgnoreCase("Unknown"))
-        {
+        if(SearchNormalizer.isUnknown(expectProduct)) {
             return true;
         }
+        String normalizedExpectProduct = SearchNormalizer.normalize(expectProduct);
+
         for (ProductResponse product : products) {
             String actualProduct = product.getProductName();
 
             if(actualProduct == null || actualProduct.isBlank()) {
                 continue;
             }
+            String normalizedActualProduct = SearchNormalizer.normalize(actualProduct);
 
-            if(actualProduct.toLowerCase().contains(expectProduct.toLowerCase())){
-                {
-                    return true;
-                }
+            if(normalizedActualProduct.contains(normalizedExpectProduct)){
+                return true;
             }
         }
         return false;

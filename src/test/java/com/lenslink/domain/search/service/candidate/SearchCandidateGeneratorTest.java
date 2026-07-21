@@ -107,4 +107,16 @@ class SearchCandidateGeneratorTest {
         assertEquals(List.of("Nike Air Force 1", "Air Force 1", "Nike"),candidates);
     }
 
+    @Test
+    void 특수문자변환체크(){
+        AnalyzeResponse analyzeResponse =
+                AnalyzeResponse.builder()
+                        .brand(" Nike® ")
+                        .productName("Air Force 1")
+                        .build();
+        List<String> candidates = generator.createCandidates(analyzeResponse);
+        assertEquals(List.of("nike air force 1", "air force 1", "nike"), candidates);
+    }
+
+
 }
