@@ -24,6 +24,14 @@ SearchService
 OpenAIService
       │
       ▼
+AnalyzeResponse
+      │
+      ├──────────────┐
+      ▼              │
+SearchHistory 저장    │
+(MySQL)              │
+      │              │
+      ▼              │
 SearchPlatformService
       │
       ▼
@@ -60,6 +68,7 @@ Flutter ResultPage
 - 문자열 정규화 규칙을 공통으로 관리
 - 공통 SearchResponse 반환
 - SearchService에서 새상품과 중고 상품을 분리하여 프론트에 전달
+- 검색 이력을 DB에 저장하여 추후 조회 및 분석 기능 확장 가능
 
 ---
 
@@ -67,8 +76,11 @@ Flutter ResultPage
 
 | 컴포넌트 | 역할 |
 |----------|------|
+| SearchService | 전체 검색 흐름을 조합하고 검색 이력을 저장 |
 | SearchPlatform | 플랫폼별 검색 인터페이스 |
 | SearchPlatformService | 등록된 플랫폼을 순회하며 검색 수행 |
 | SearchCandidateGenerator | OpenAI 분석 결과를 기반으로 검색 후보 생성 |
 | SearchNormalizer | 검색어와 검색 결과 문자열 정규화 |
 | SearchResultEvaluator | 검색 결과의 품질을 평가하여 재검색 여부 결정 |
+| SearchHistory | 검색 이력 저장 Entity |
+| SearchHistoryRepository | 검색 이력 저장 및 조회 |
