@@ -58,6 +58,7 @@ Flutter ResultPage
 
 ---
 
+
 ## 설계 목표
 
 - 플랫폼별 검색 로직 분리
@@ -84,3 +85,35 @@ Flutter ResultPage
 | SearchResultEvaluator | 검색 결과의 품질을 평가하여 재검색 여부 결정 |
 | SearchHistory | 검색 이력 저장 Entity |
 | SearchHistoryRepository | 검색 이력 저장 및 조회 |
+
+## Recent Search API
+
+## 전체 흐름
+
+```
+Flutter
+        │
+        ▼
+GET /api/searches/history
+        │
+        ▼
+SearchController
+        │
+        ▼
+SearchHistoryService
+        │
+        ▼
+SearchHistoryRepository
+        │
+        ▼
+MySQL
+        │
+        ▼
+List<SearchHistory>
+        │
+        ▼
+SearchHistoryResponse
+        │
+        ▼
+JSON Response
+```
