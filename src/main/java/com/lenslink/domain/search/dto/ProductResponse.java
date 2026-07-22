@@ -1,5 +1,6 @@
 package com.lenslink.domain.search.dto;
 
+import com.lenslink.domain.search.entity.SearchHistory;
 import lombok.Builder;
 import lombok.Getter;
 
