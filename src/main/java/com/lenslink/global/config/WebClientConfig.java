@@ -1,4 +1,4 @@
-package com.lenslink.config;
+package com.lenslink.global.config;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
