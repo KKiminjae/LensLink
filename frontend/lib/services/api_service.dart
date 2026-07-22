@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+import '../models/recent_search.dart';
 import '../models/search_response.dart';
 
 class ApiService {
@@ -21,11 +22,22 @@ class ApiService {
       ),
     });
 
-    final response = await _dio.post(
-      "/api/searches/analyze",
-      data: formData,
-    );
+    final response = await _dio.post("/api/searches/analyze", data: formData);
 
     return SearchResponse.fromJson(response.data);
+  }
+
+  Future<List<RecentSearch>> getRecentSearches() async {
+    final response = await _dio.get("/api/searches/history");
+    final data = response.data;
+
+    if (data is! List) {
+      return [];
+    }
+
+    return data
+        .whereType<Map>()
+        .map((item) => RecentSearch.fromJson(Map<String, dynamic>.from(item)))
+        .toList();
   }
 }
