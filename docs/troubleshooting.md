@@ -229,7 +229,7 @@ SearchNormalizer를 도입하여
 SearchCandidateGenerator와 SearchResultEvaluator 모두 동일한 정규화 규칙을 사용하도록 변경하였다.
 
 ---
-## OpenAI와 네이버 상품명 불일치
+## 9.
 
 ### 문제
 
@@ -274,3 +274,50 @@ brandMatched=true
 productMatched=true
 
 검색 품질이 개선되어 실제 검색 결과를 정상적으로 반환하였다.
+
+___
+## 10.
+
+### 문제
+
+검색 기록 저장 시 다음 오류가 발생하였다.
+``` text
+Field 'search_keyword' doesn't have a default value
+```
+
+### 원인 분석
+
+원인 분석
+
+ProductResponse.imageUrl
+
+정상
+
+SearchHistory.imageUrl
+
+정상
+
+Hibernate INSERT
+
+정상 생성
+
+MySQL에서 INSERT 실패
+
+원인
+
+Entity에서는 searchKeyword 필드를 삭제했지만 MySQL 테이블에는 search_keyword NOT NULL 컬럼이 그대로 남아 있었다.
+
+Hibernate의 ddl-auto=update는 기존 컬럼을 자동으로 삭제하지 않는다.
+
+### 해결
+
+```sql
+ALTER TABLE search_history
+DROP COLUMN search_keyword;
+``` 
+
+### 배운점
+
+* ddl-auto=update는 컬럼 삭제를 수행하지 않는다.
+* 스키마 변경 시에는 직접 마이그레이션을 수행해야 한다.
+* 로그를 API → DTO → Entity → Hibernate → DB 순서로 확인하면 원인을 빠르게 좁힐 수 있다.

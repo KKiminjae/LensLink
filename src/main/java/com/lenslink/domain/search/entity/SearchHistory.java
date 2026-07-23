@@ -16,18 +16,18 @@ public class SearchHistory extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    String brand;
+    private String brand;
 
     @Column(nullable = false)
-    String productName;
+    private String productName;
 
     @Column(nullable = false)
-    String searchKeyword;
+    private String imageUrl;
 
     @Builder
-    public SearchHistory(String productName, String brand, String searchKeyword) {
+    public SearchHistory(String productName, String brand, String imageUrl) {
         this.productName = productName;
         this.brand = brand;
-        this.searchKeyword = searchKeyword;
+        this.imageUrl = imageUrl;
     }
 }

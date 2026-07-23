@@ -27,12 +27,15 @@ public class SearchService {
 
         AnalyzeResponse analyzeResponse = openAiService.analyzeImage(image);
 
-        System.out.println("브랜드 한국이름 = " + analyzeResponse.getBrandKo() + " , 제품 한국 검색: " + analyzeResponse.getProductNameKo());
-
-        SearchHistory history = createSearchHistory(analyzeResponse);
-        repository.save(history);
-
         List<ProductResponse> products = searchPlatformService.search(analyzeResponse);
+
+        System.out.println("products size = " + products.size());
+
+        if(!products.isEmpty()){
+            SearchHistory history = createSearchHistory(analyzeResponse, products.get(0));
+            System.out.println("history image = " + history.getImageUrl());
+            repository.save(history);
+        }
 
         List<ProductResponse> newProducts = products.stream()
                 .filter(product -> !product.isUsed())
@@ -47,11 +50,11 @@ public class SearchService {
         );
     }
 
-    private SearchHistory createSearchHistory(AnalyzeResponse analyzeResponse){
+    private SearchHistory createSearchHistory(AnalyzeResponse analyzeResponse, ProductResponse product){
         return SearchHistory.builder()
                 .brand(analyzeResponse.getBrand())
                 .productName(analyzeResponse.getProductName())
-                .searchKeyword(analyzeResponse.getSearchKeyword())
+                .imageUrl(product.getImageUrl())
                 .build();
     }
 }
