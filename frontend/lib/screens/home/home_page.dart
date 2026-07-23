@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../models/recent_search.dart';
+import '../../services/api_service.dart';
 import '../../services/image_picker_service.dart';
 import '../../widgets/lens_bottom_navigation.dart';
 import '../analysis/analysis_page.dart';
@@ -15,25 +17,42 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final ApiService _apiService = ApiService();
   final ImagePickerService _imagePickerService = ImagePickerService();
 
-  final List<_RecentSearch> recentSearches = const [
-    _RecentSearch(
-      title: "Nike Air Max DN Triple Black",
-      date: "2024.05.21",
-      icon: Icons.directions_run,
-    ),
-    _RecentSearch(
-      title: "Stussy 8 Ball Hoodie",
-      date: "2024.05.20",
-      icon: Icons.checkroom,
-    ),
-    _RecentSearch(
-      title: "Carhartt Detroit Jacket",
-      date: "2024.05.18",
-      icon: Icons.inventory_2_outlined,
-    ),
-  ];
+  List<RecentSearch> _recentSearches = [];
+  bool _isHistoryLoading = false;
+  String? _historyErrorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecentSearches();
+  }
+
+  Future<void> _loadRecentSearches() async {
+    setState(() {
+      _isHistoryLoading = true;
+      _historyErrorMessage = null;
+    });
+
+    try {
+      final searches = await _apiService.getRecentSearches();
+      if (!mounted) return;
+
+      setState(() {
+        _recentSearches = searches;
+        _isHistoryLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+
+      setState(() {
+        _historyErrorMessage = "최근 검색을 불러오지 못했어요";
+        _isHistoryLoading = false;
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     final image = await _imagePickerService.pickImage();
@@ -105,8 +124,11 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               const SizedBox(height: 10),
-              ...recentSearches.map(
-                (search) => _RecentSearchTile(search: search),
+              _RecentSearchSection(
+                searches: _recentSearches,
+                isLoading: _isHistoryLoading,
+                errorMessage: _historyErrorMessage,
+                onRetry: _loadRecentSearches,
               ),
             ],
           ),
@@ -194,8 +216,101 @@ class _UploadBox extends StatelessWidget {
   }
 }
 
+class _RecentSearchSection extends StatelessWidget {
+  final List<RecentSearch> searches;
+  final bool isLoading;
+  final String? errorMessage;
+  final VoidCallback onRetry;
+
+  const _RecentSearchSection({
+    required this.searches,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 14),
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (errorMessage != null) {
+      return _RecentSearchMessage(
+        message: errorMessage!,
+        actionText: "다시 시도",
+        onAction: onRetry,
+      );
+    }
+
+    if (searches.isEmpty) {
+      return const _RecentSearchMessage(message: "최근 검색 내역이 없어요");
+    }
+
+    return Column(
+      children: searches
+          .map((search) => _RecentSearchTile(search: search))
+          .toList(),
+    );
+  }
+}
+
+class _RecentSearchMessage extends StatelessWidget {
+  final String message;
+  final String? actionText;
+  final VoidCallback? onAction;
+
+  const _RecentSearchMessage({
+    required this.message,
+    this.actionText,
+    this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: AppColors.subText, fontSize: 12),
+            ),
+          ),
+          if (actionText != null && onAction != null)
+            TextButton(
+              onPressed: onAction,
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: const Size(48, 30),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                actionText!,
+                style: const TextStyle(color: AppColors.primary, fontSize: 12),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RecentSearchTile extends StatelessWidget {
-  final _RecentSearch search;
+  final RecentSearch search;
 
   const _RecentSearchTile({required this.search});
 
@@ -213,7 +328,7 @@ class _RecentSearchTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.border),
             ),
-            child: Icon(search.icon, color: Colors.black, size: 22),
+            child: const Icon(Icons.history, color: Colors.black, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -232,7 +347,7 @@ class _RecentSearchTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  search.date,
+                  _formatDate(search.createdAt),
                   style: const TextStyle(color: Colors.black, fontSize: 11),
                 ),
               ],
@@ -242,18 +357,16 @@ class _RecentSearchTile extends StatelessWidget {
       ),
     );
   }
-}
 
-class _RecentSearch {
-  final String title;
-  final String date;
-  final IconData icon;
+  String _formatDate(DateTime? date) {
+    if (date == null) return "";
 
-  const _RecentSearch({
-    required this.title,
-    required this.date,
-    required this.icon,
-  });
+    final year = date.year.toString().padLeft(4, "0");
+    final month = date.month.toString().padLeft(2, "0");
+    final day = date.day.toString().padLeft(2, "0");
+
+    return "$year.$month.$day";
+  }
 }
 
 class _DashedBorderPainter extends CustomPainter {
