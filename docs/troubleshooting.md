@@ -227,3 +227,50 @@ SearchNormalizer를 도입하여
 를 공통 적용하였다.
 
 SearchCandidateGenerator와 SearchResultEvaluator 모두 동일한 정규화 규칙을 사용하도록 변경하였다.
+
+---
+## OpenAI와 네이버 상품명 불일치
+
+### 문제
+
+검색 결과는 존재하지만 SearchResultEvaluator가 항상 false를 반환하였다.
+
+로그
+
+brandMatched=true
+
+productMatched=false
+
+원인
+
+- OpenAI는 영문 상품명을 반환
+- 네이버는 한글 상품명을 사용
+
+또한 쇼핑몰마다 상품명 구성이 서로 달라 문자열 전체 비교가 실패하였다.
+
+---
+
+### 해결
+
+1. OpenAI 프롬프트 수정
+
+추가 필드
+
+- brandKo
+- productNameKo
+
+2. SearchResultEvaluator 개선
+
+- 영문/한글 브랜드 모두 비교
+- 영문/한글 상품명 모두 비교
+- 문자열 전체 비교 대신 토큰 기반 비교 적용
+
+---
+
+### 결과
+
+brandMatched=true
+
+productMatched=true
+
+검색 품질이 개선되어 실제 검색 결과를 정상적으로 반환하였다.
