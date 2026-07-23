@@ -27,6 +27,8 @@ public class SearchService {
 
         AnalyzeResponse analyzeResponse = openAiService.analyzeImage(image);
 
+        System.out.println("브랜드 한국이름 = " + analyzeResponse.getBrandKo() + " , 제품 한국 검색: " + analyzeResponse.getProductNameKo());
+
         SearchHistory history = createSearchHistory(analyzeResponse);
         repository.save(history);
 
