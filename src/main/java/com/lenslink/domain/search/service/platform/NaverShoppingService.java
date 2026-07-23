@@ -36,7 +36,6 @@ public class NaverShoppingService implements SearchPlatform{
 
         for (String keyword : candidates) {
             List<ProductResponse> products = searchByKeyword(keyword);
-
             if(searchResultEvaluator.isGoodResult(analyzeResponse, products)){
                 return products;
             }
