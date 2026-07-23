@@ -12,7 +12,11 @@ public class AnalyzeResponse {
 
     private String brand;
 
+    private String brandKo;
+
     private String productName;
+
+    private String productNameKo;
 
     private String color;
 

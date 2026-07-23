@@ -49,6 +49,7 @@ public class OpenAiService {
                         
                         1. 이미지 속 상품의 공식 브랜드명과 공식 상품명을 최대한 정확하게 추론합니다.
                         2. 네이버 쇼핑 등 온라인 쇼핑몰에서 검색 성공률이 가장 높은 검색 키워드를 생성합니다.
+                        3. 브랜드명과 상품명은 영어와 한국어를 모두 반환합니다.
                         
                         productName과 searchKeyword는 서로 다른 목적을 가지며 동일할 필요는 없습니다.
                         
@@ -72,6 +73,14 @@ public class OpenAiService {
                         - 모델명이나 컬렉션명이 확인되면 반드시 포함하세요.
                         - 색상은 검색 정확도 향상에 도움이 될 경우만 포함하세요.
                         - confidence는 0~100 사이의 정수입니다.
+                        - brand는 공식 영문 브랜드명입니다.
+                        - brandKo는 국내 쇼핑몰에서 일반적으로 사용하는 한국어 브랜드명입니다.
+                        - productName은 공식 영문 상품명입니다.
+                        - productNameKo는 국내 쇼핑몰에서 일반적으로 사용하는 한국어 상품명입니다.
+                        - productNameKo는 직역하지 말고 국내 쇼핑몰에서 실제 사용하는 표현을 사용하세요.
+                        - 한국어 명칭을 알 수 없으면 "Unknown"을 반환하세요.
+                        - brand, brandKo, productName, productNameKo는 모두 동일한 상품을 의미해야 합니다.
+                          영문과 한국어 명칭이 서로 다른 상품이 되면 안 됩니다.
                         
                         searchKeyword 생성 규칙
                         
@@ -95,31 +104,103 @@ public class OpenAiService {
                         예시
                         
                         예시 1
+                        
+                        brand:
+                        Nike
+                        
+                        brandKo:
+                        나이키
+                        
                         productName:
-                        Nike Sportswear Club Fleece Pullover Hoodie
+                        Sportswear Club Fleece Pullover Hoodie
+                        
+                        productNameKo:
+                        스포츠웨어 클럽 플리스 풀오버 후디
                         
                         searchKeyword:
                         Nike Club Fleece Hoodie
                         
+                        --------------------------------------------------
+                        
                         예시 2
+                        
+                        brand:
+                        Rick Owens
+                        
+                        brandKo:
+                        릭오웬스
+                        
                         productName:
-                        Rick Owens Drkshdw Low-Top Distressed Canvas Sneaker
+                        Drkshdw Low-Top Distressed Canvas Sneaker
+                        
+                        productNameKo:
+                        DRKSHDW 로우탑 디스트레스드 캔버스 스니커즈
                         
                         searchKeyword:
                         Rick Owens Low Top Sneaker
                         
+                        --------------------------------------------------
+                        
                         예시 3
+                        
+                        brand:
+                        Unknown
+                        
+                        brandKo:
+                        Unknown
+                        
                         productName:
                         Athletic Department Crest Logo Tee
                         
+                        productNameKo:
+                        애슬레틱 디파트먼트 크레스트 로고 티셔츠
+                        
                         searchKeyword:
                         Athletic Department Logo Tee
+                        
+                        --------------------------------------------------
+                        
+                        brand와 productName은 반드시 분리해야 합니다.
+                        
+                        brand는 공식 영문 브랜드명입니다.
+                        brandKo는 국내 쇼핑몰에서 일반적으로 사용하는 한국어 브랜드명입니다.
+                        
+                        productName은 공식 영문 상품명입니다.
+                        productNameKo는 국내 쇼핑몰에서 일반적으로 사용하는 한국어 상품명입니다.
+                        
+                        productName에는 브랜드명을 절대 포함하지 마세요.
+                        
+                        ❌ 잘못된 예
+                        
+                        brand:
+                        Nike
+                        
+                        productName:
+                        Nike Air Force 1
+                        
+                        ---------------------------------
+                        
+                        ⭕ 올바른 예
+                        
+                        brand:
+                        Nike
+                        
+                        productName:
+                        Air Force 1
+                        
+                        brandKo:
+                        나이키
+                        
+                        productNameKo:
+                        에어포스 1
                         
                         다음 JSON 형식으로만 응답하세요.
                         
                         {
                           "brand": "",
+                          "brandKo":"",
                           "productName": "",
+                          "productNameKo": "",
                           "color": "",
                           "category": "",
                           "confidence": 0,

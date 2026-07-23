@@ -16,7 +16,7 @@ public class SearchHistoryResponse {
 
     private String productName;
 
-    private String searchKeyword;
+    private String imageUrl;
 
     private LocalDateTime createdAt;
 
@@ -25,7 +25,7 @@ public class SearchHistoryResponse {
                 .id(history.getId())
                 .brand(history.getBrand())
                 .productName(history.getProductName())
-                .searchKeyword(history.getSearchKeyword())
+                .imageUrl(history.getImageUrl())
                 .createdAt(history.getCreatedAt())
                 .build();
     }
