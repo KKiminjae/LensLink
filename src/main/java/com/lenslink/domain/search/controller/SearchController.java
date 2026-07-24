@@ -23,10 +23,4 @@ public class SearchController {
     public SearchResponse analyze(@RequestParam("image")MultipartFile image){
         return searchService.search(image);
     }
-
-
-    @GetMapping("/history")
-    public List<SearchHistoryResponse> getRecentSearches(){
-        return searchHistoryService.getRecentSearches();
-    }
 }
