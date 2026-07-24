@@ -321,3 +321,21 @@ DROP COLUMN search_keyword;
 * ddl-auto=update는 컬럼 삭제를 수행하지 않는다.
 * 스키마 변경 시에는 직접 마이그레이션을 수행해야 한다.
 * 로그를 API → DTO → Entity → Hibernate → DB 순서로 확인하면 원인을 빠르게 좁힐 수 있다.
+
+---
+
+## 11.
+
+### 문제
+
+Repository에서 Pageable을 사용하려고 했지만 오류가 발생하였다.
+
+원인은 잘못된 import였다.
+
+잘못된 코드
+
+```java
+import java.awt.print.Pageable;
+```
+
+---

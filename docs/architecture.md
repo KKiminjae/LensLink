@@ -70,6 +70,7 @@ Flutter ResultPage
 - 공통 SearchResponse 반환
 - SearchService에서 새상품과 중고 상품을 분리하여 프론트에 전달
 - 검색 이력을 DB에 저장하여 추후 조회 및 분석 기능 확장 가능
+- Pageable 기반 조회로 대량 데이터에도 확장 가능한 구조
 
 ---
 
@@ -84,7 +85,8 @@ Flutter ResultPage
 | SearchNormalizer | 검색어와 검색 결과 문자열 정규화 |
 | SearchResultEvaluator | 검색 결과의 품질을 평가하여 재검색 여부 결정 |
 | SearchHistory | 검색 이력 저장 Entity |
-| SearchHistoryRepository | 검색 이력 저장 및 조회 |
+| SearchHistoryService | 검색 이력 저장 및 조회 |
+| SearchHistoryController | 검색 기록 조회 API 제공 |
 
 ## Recent Search API
 
@@ -109,11 +111,25 @@ SearchHistoryRepository
 MySQL
         │
         ▼
-List<SearchHistory>
+Page<SearchHistory>
         │
         ▼
-SearchHistoryResponse
+Page<SearchHistoryResponse>
         │
         ▼
 JSON Response
 ```
+
+### Recent Search API
+
+#### GET /api/searches/history/recent
+
+- 최근 검색 3건 조회
+- Home 화면의 최근 검색 영역에서 사용
+
+#### GET /api/searches/history
+
+- 전체 검색 기록 조회
+- Pageable 기반 페이지네이션
+- 기본 30개 조회
+- createdAt DESC 정렬
